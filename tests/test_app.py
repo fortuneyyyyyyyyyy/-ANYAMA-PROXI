@@ -45,6 +45,21 @@ def test_artisan_submission_persists(client):
         assert Artisan.query.filter_by(name="Awa Kouassi").count() == 1
 
 
+def test_international_phone_and_whatsapp_links_are_accepted(client):
+    response = client.post("/artisans", data={
+        "csrf_token": csrf_token(client),
+        "name": "Mariam Nguessan",
+        "job": "Coiffeuse",
+        "neighborhood": "Anyama Centre",
+        "phone": "+225 07 12 41 35 49",
+    }, follow_redirects=True)
+    assert response.status_code == 200
+    assert b"wa.me" in response.data
+    assert b"Appeler" in response.data
+    with client.application.app_context():
+        assert Artisan.query.filter_by(name="Mariam Nguessan").count() == 1
+
+
 def test_invalid_submission_is_rejected(client):
     response = client.post("/artisans", data={
         "csrf_token": csrf_token(client),

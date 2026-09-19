@@ -3,7 +3,7 @@ import unicodedata
 
 NAME_RE = re.compile(r"^[\wÀ-ÖØ-öø-ÿ .'-]+$", re.UNICODE)
 JOB_RE = re.compile(r"^[\wÀ-ÖØ-öø-ÿ /&().'-]+$", re.UNICODE)
-PHONE_RE = re.compile(r"^[0-9 +().-]+$")
+PHONE_RE = re.compile(r"^\+?[0-9][0-9 +().-]*$")
 
 
 def clean_text(value: str, max_length: int) -> str:

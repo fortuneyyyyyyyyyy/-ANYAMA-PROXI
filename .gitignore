@@ -8,3 +8,4 @@ __pycache__/
 *.log
 instance/
 .DS_Store
+.envprod

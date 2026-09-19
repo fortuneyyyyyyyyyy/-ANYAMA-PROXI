@@ -54,9 +54,8 @@ Ajouter une validation manuelle par un administrateur, une fonction de retrait/m
 ```bash
 pytest -q
 ```
-git init
+
 git add .
-git commit -m "v1 ANYAMA PROXI"
-git branch -M main
-git remote add origin https://github.com/fortuneyyyyyyyyyy/-ANYAMA-PROXI.git
+git commit -m "v1.1 ANYAMA PROXI"
+
 git push -u origin main
