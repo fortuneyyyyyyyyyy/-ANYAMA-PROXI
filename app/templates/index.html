@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="fr">
 <head>
   <meta charset="utf-8">
@@ -6,15 +6,37 @@
   <meta name="description" content="Trouve rapidement un artisan près de chez toi à Anyama.">
   <title>ANYAMA PROXI — Les artisans près de chez toi</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    (function() {
+      const saved = localStorage.getItem('anyama-theme');
+      const theme = saved || 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
 </head>
-<body>
+<body data-theme="light">
   <header class="site-header">
-    <div class="brand-mark" aria-hidden="true">AP</div>
-    <div><p class="eyebrow">Carrefour Ferraille & alentours</p><h1>ANYAMA <span>PROXI</span></h1></div>
+    <div class="header-left">
+      <div class="brand-mark" aria-hidden="true">AP</div>
+      <div>
+        <p class="eyebrow">Carrefour Ferraille &amp; alentours</p>
+        <h1>ANYAMA <span>PROXI</span></h1>
+      </div>
+    </div>
+    <button class="theme-toggle" type="button" data-theme-toggle aria-label="Basculer le thème">
+      <i data-lucide="sun" class="theme-toggle-icon light-icon"></i>
+      <i data-lucide="moon" class="theme-toggle-icon dark-icon"></i>
+    </button>
   </header>
+
   <main>
     <section class="hero" aria-labelledby="intro-title">
-      <div><p class="eyebrow">Le bon contact, au bon moment</p><h2 id="intro-title">Un artisan local pour chaque petit boulot.</h2><p class="intro">Cherche un métier, un nom ou un quartier. Appelle directement et fais travailler quelqu'un de chez toi.</p></div>
+      <div>
+        <p class="eyebrow">Le bon contact, au bon moment</p>
+        <h2 id="intro-title">Un artisan local pour chaque petit boulot.</h2>
+        <p class="intro">Cherche un métier, un nom ou un quartier. Appelle directement et fais travailler quelqu'un de chez toi.</p>
+      </div>
       <div class="hero-badge"><strong>{{ artisans|length }}</strong><span>contacts affichés</span></div>
     </section>
 
@@ -23,19 +45,62 @@
     {% endwith %}
 
     <section class="directory" aria-labelledby="directory-title">
-      <div class="section-heading"><div><p class="eyebrow">Annuaire local</p><h2 id="directory-title">Trouver un pro</h2></div><span class="count">{{ artisans|length }} résultat{% if artisans|length != 1 %}s{% endif %}</span></div>
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Annuaire local</p>
+          <h2 id="directory-title">Trouver un pro</h2>
+        </div>
+        <span class="count">{{ artisans|length }} résultat{% if artisans|length != 1 %}s{% endif %}</span>
+      </div>
       <form class="search" method="get" action="{{ url_for('index') }}" role="search">
-        <label class="sr-only" for="q">Rechercher un artisan</label><span aria-hidden="true">⌕</span><input id="q" name="q" value="{{ query }}" maxlength="80" placeholder="Nom, métier ou quartier…"><button type="submit">Chercher</button>
+        <label class="sr-only" for="q">Rechercher un artisan</label>
+        <span aria-hidden="true">⌕</span>
+        <input id="q" name="q" value="{{ query }}" maxlength="80" placeholder="Nom, métier ou quartier…">
+        <button type="submit">Chercher</button>
       </form>
       <nav class="filters" aria-label="Filtrer par métier">
         <a class="filter {% if category == 'Tous' %}active{% endif %}" href="{{ url_for('index', q=query) }}">Tous</a>
         {% for item in categories %}<a class="filter {% if category == item %}active{% endif %}" href="{{ url_for('index', q=query, category=item) }}">{{ item }}</a>{% endfor %}
       </nav>
-      {% if artisans %}<div class="grid">{% for artisan in artisans %}{% set tel_href = artisan.phone|replace(' ', '')|replace('-', '')|replace('(', '')|replace(')', '') %}{% set whatsapp_digits = tel_href|replace('+', '') %}<article class="card"><div class="card-top"><div class="avatar" aria-hidden="true">{{ artisan.name[0]|upper }}</div><div><h3>{{ artisan.name }}</h3><p class="job">{{ artisan.job }}</p></div></div><p class="location">⌖ {{ artisan.neighborhood }}</p><div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:14px;"><a class="phone" href="tel:{{ tel_href }}" style="flex:1; min-width:120px; display:inline-flex; justify-content:center; align-items:center; padding:11px 13px; border-radius:999px; background:var(--lime); font-weight:700; text-decoration:none;">Appeler <span style="margin-left:6px;">{{ artisan.phone }}</span></a><a class="whatsapp" href="https://wa.me/{{ whatsapp_digits }}" target="_blank" rel="noopener noreferrer" style="flex:1; min-width:120px; display:inline-flex; justify-content:center; align-items:center; padding:11px 13px; border-radius:999px; background:#25D366; color:#062b16; font-weight:700; text-decoration:none;">WhatsApp</a></div></article>{% endfor %}</div>{% else %}<div class="empty"><strong>Aucun contact trouvé.</strong><p>Essaie un autre mot ou inscris-toi comme artisan.</p></div>{% endif %}
+      {% if artisans %}
+        <div class="grid">
+          {% for artisan in artisans %}
+            {% set tel_href = artisan.phone|replace(' ', '')|replace('-', '')|replace('(', '')|replace(')', '') %}
+            {% set whatsapp_digits = tel_href|replace('+', '') %}
+            <article class="card">
+              <div class="card-top">
+                <div class="avatar" aria-hidden="true">{{ artisan.name[0]|upper }}</div>
+                <div>
+                  <h3>{{ artisan.name }}</h3>
+                  <p class="job">{{ artisan.job }}</p>
+                </div>
+              </div>
+              <p class="location">⌖ {{ artisan.neighborhood }}</p>
+              <div class="contact-actions">
+                <a class="phone" href="tel:{{ tel_href }}">
+                  <i data-lucide="phone"></i>
+                  <span>Appeler</span>
+                  <span>{{ artisan.phone }}</span>
+                </a>
+                <a class="whatsapp" href="https://wa.me/{{ whatsapp_digits }}" target="_blank" rel="noopener noreferrer">
+                  <i data-lucide="message-circle-more"></i>
+                  <span>WhatsApp</span>
+                </a>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty"><strong>Aucun contact trouvé.</strong><p>Essaie un autre mot ou inscris-toi comme artisan.</p></div>
+      {% endif %}
     </section>
 
     <section class="signup" aria-labelledby="signup-title">
-      <div class="signup-copy"><p class="eyebrow">Tu proposes un service ?</p><h2 id="signup-title">Rends-toi visible gratuitement.</h2><p>Inscris ton contact en moins d'une minute. Pas de compte, pas de frais.</p></div>
+      <div class="signup-copy">
+        <p class="eyebrow">Tu proposes un service ?</p>
+        <h2 id="signup-title">Rends-toi visible gratuitement.</h2>
+        <p>Inscris ton contact en moins d'une minute. Pas de compte, pas de frais.</p>
+      </div>
       <form class="signup-form" method="post" action="{{ url_for('create_artisan') }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="honeypot" aria-hidden="true"><label for="website">Ne pas remplir</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
@@ -49,6 +114,45 @@
       </form>
     </section>
   </main>
-  <footer><strong>ANYAMA PROXI</strong><span>Un annuaire de proximité, fait pour Anyama.</span></footer>
+
+  <footer class="site-footer">
+    <div class="footer-brand">
+      <div class="brand-mark footer-mark" aria-hidden="true">AP</div>
+      <div class="footer-text">
+        <span class="footer-kicker">Carrefour Ferraille &amp; alentours</span>
+        <strong>ANYAMA PROXI</strong>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+
+      const toggle = document.querySelector('[data-theme-toggle]');
+      const root = document.documentElement;
+      const setTheme = function (theme) {
+        root.setAttribute('data-theme', theme);
+        document.body.setAttribute('data-theme', theme);
+        localStorage.setItem('anyama-theme', theme);
+        if (toggle) {
+          toggle.setAttribute('aria-label', theme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre');
+          toggle.classList.toggle('is-dark', theme === 'dark');
+        }
+      };
+
+      const initialTheme = localStorage.getItem('anyama-theme') || 'light';
+      setTheme(initialTheme);
+
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          const nextTheme = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+          setTheme(nextTheme);
+        });
+      }
+    });
+  </script>
 </body>
 </html>
