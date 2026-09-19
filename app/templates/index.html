@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Trouve rapidement un artisan près de chez toi à Anyama.">
+  <title>ANYAMA PROXI — Les artisans près de chez toi</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand-mark" aria-hidden="true">AP</div>
+    <div><p class="eyebrow">Carrefour Ferraille & alentours</p><h1>ANYAMA <span>PROXI</span></h1></div>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="intro-title">
+      <div><p class="eyebrow">Le bon contact, au bon moment</p><h2 id="intro-title">Un artisan local pour chaque petit boulot.</h2><p class="intro">Cherche un métier, un nom ou un quartier. Appelle directement et fais travailler quelqu'un de chez toi.</p></div>
+      <div class="hero-badge"><strong>{{ artisans|length }}</strong><span>contacts affichés</span></div>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}<div class="flash-stack" aria-live="polite">{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+    {% endwith %}
+
+    <section class="directory" aria-labelledby="directory-title">
+      <div class="section-heading"><div><p class="eyebrow">Annuaire local</p><h2 id="directory-title">Trouver un pro</h2></div><span class="count">{{ artisans|length }} résultat{% if artisans|length != 1 %}s{% endif %}</span></div>
+      <form class="search" method="get" action="{{ url_for('index') }}" role="search">
+        <label class="sr-only" for="q">Rechercher un artisan</label><span aria-hidden="true">⌕</span><input id="q" name="q" value="{{ query }}" maxlength="80" placeholder="Nom, métier ou quartier…"><button type="submit">Chercher</button>
+      </form>
+      <nav class="filters" aria-label="Filtrer par métier">
+        <a class="filter {% if category == 'Tous' %}active{% endif %}" href="{{ url_for('index', q=query) }}">Tous</a>
+        {% for item in categories %}<a class="filter {% if category == item %}active{% endif %}" href="{{ url_for('index', q=query, category=item) }}">{{ item }}</a>{% endfor %}
+      </nav>
+      {% if artisans %}<div class="grid">{% for artisan in artisans %}<article class="card"><div class="card-top"><div class="avatar" aria-hidden="true">{{ artisan.name[0]|upper }}</div><div><h3>{{ artisan.name }}</h3><p class="job">{{ artisan.job }}</p></div></div><p class="location">⌖ {{ artisan.neighborhood }}</p><a class="phone" href="tel:{{ artisan.phone|replace(' ', '')|replace('-', '') }}">Appeler <span>{{ artisan.phone }}</span></a></article>{% endfor %}</div>{% else %}<div class="empty"><strong>Aucun contact trouvé.</strong><p>Essaie un autre mot ou inscris-toi comme artisan.</p></div>{% endif %}
+    </section>
+
+    <section class="signup" aria-labelledby="signup-title">
+      <div class="signup-copy"><p class="eyebrow">Tu proposes un service ?</p><h2 id="signup-title">Rends-toi visible gratuitement.</h2><p>Inscris ton contact en moins d'une minute. Pas de compte, pas de frais.</p></div>
+      <form class="signup-form" method="post" action="{{ url_for('create_artisan') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="honeypot" aria-hidden="true"><label for="website">Ne pas remplir</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
+        <label for="name">Nom complet<input id="name" name="name" required maxlength="80" autocomplete="name" placeholder="Ex. Fofana Moussa"></label>
+        <label for="job">Métier<input id="job" name="job" required maxlength="60" list="jobs" placeholder="Ex. Réparateur TV"></label>
+        <datalist id="jobs"><option>Chauffeur</option><option>Couturier</option><option>Jardinier</option><option>Coiffeur</option><option>Réparateur TV</option><option>Maçon</option><option>Plombier</option><option>Électricien</option><option>Mécanicien</option><option>Menuisier</option><option>Photographe</option></datalist>
+        <label for="neighborhood">Quartier<input id="neighborhood" name="neighborhood" required maxlength="80" placeholder="Ex. Carrefour Ferraille"></label>
+        <label for="phone">Téléphone / WhatsApp<input id="phone" name="phone" required maxlength="32" inputmode="tel" autocomplete="tel" placeholder="07 12 41 35 49"></label>
+        <button class="submit" type="submit">S'inscrire gratuitement <span>→</span></button>
+        <p class="privacy-note">En t'inscrivant, tu acceptes que ces coordonnées soient publiques dans l'annuaire.</p>
+      </form>
+    </section>
+  </main>
+  <footer><strong>ANYAMA PROXI</strong><span>Un annuaire de proximité, fait pour Anyama.</span></footer>
+</body>
+</html>
